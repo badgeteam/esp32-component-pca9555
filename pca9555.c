@@ -63,8 +63,8 @@ esp_err_t pca9555_init(PCA9555* device) {
     return ESP_OK;
 }
 
-int pca9555_set_gpio_direction(PCA9555* device, int pin, bool direction) {
-    if ((pin < 0) || (pin > 15)) return -1;  // Out of range
+esp_err_t pca9555_set_gpio_direction(PCA9555* device, int pin, bool direction) {
+    if ((pin < 0) || (pin > 15)) return ESP_FAIL;  // Out of range
     uint8_t port          = (pin >= 8) ? 1 : 0;
     uint8_t bit           = pin % 8;
     bool    current_state = (device->reg_config[port] >> bit) & 1;
@@ -76,9 +76,7 @@ int pca9555_set_gpio_direction(PCA9555* device, int pin, bool direction) {
             device->reg_config[port] |= (1 << bit);   // Set the pin to input
         }
     }
-    esp_err_t res = write_reg(device, REG_CONFIG_0, device->reg_config, 2);
-    if (res != ESP_OK) return -1;
-    return 0;
+    return write_reg(device, REG_CONFIG_0, device->reg_config, 2);
 }
 
 int pca9555_get_gpio_direction(PCA9555* device, int pin) {
@@ -88,8 +86,8 @@ int pca9555_get_gpio_direction(PCA9555* device, int pin) {
     return (device->reg_config[port] >> bit) & 1;  // Return 1 when the pin is an input and 0 when the pin is output
 }
 
-int pca9555_set_gpio_polarity(PCA9555* device, int pin, bool polarity) {
-    if ((pin < 0) || (pin > 15)) return -1;  // Out of range
+esp_err_t pca9555_set_gpio_polarity(PCA9555* device, int pin, bool polarity) {
+    if ((pin < 0) || (pin > 15)) return ESP_FAIL;  // Out of range
     uint8_t port          = (pin >= 8) ? 1 : 0;
     uint8_t bit           = pin % 8;
     bool current_state    = (device->reg_polarity[port] >> bit) & 1;
@@ -100,9 +98,7 @@ int pca9555_set_gpio_polarity(PCA9555* device, int pin, bool polarity) {
             device->reg_polarity[port] |= (1 << bit); // Set pin to inverted mode
         }
     }
-    esp_err_t res = write_reg(device, REG_POLARITY_0, device->reg_polarity, 2);
-    if (res != ESP_OK) return -1;
-    return 0;
+    return write_reg(device, REG_POLARITY_0, device->reg_polarity, 2);
 }
 
 int pca9555_get_gpio_polarity(PCA9555* device, int pin) {
@@ -112,13 +108,13 @@ int pca9555_get_gpio_polarity(PCA9555* device, int pin) {
     return (device->reg_polarity[port] >> bit) & 1;  // Return 0 when the pin is in normal mode and 1 when the pin is in inverted mode
 }
 
-int pca9555_set_gpio_value(PCA9555* device, int pin, bool value) {
-    if ((pin < 0) || (pin > 15)) return -1;  // Out of range
+esp_err_t pca9555_set_gpio_value(PCA9555* device, int pin, bool value) {
+    if ((pin < 0) || (pin > 15)) return ESP_FAIL;  // Out of range
     uint8_t port = (pin >= 8) ? 1 : 0;
     uint8_t bit  = pin % 8;
     if (pca9555_get_gpio_direction(device, pin) == PCA_INPUT) {
         ESP_LOGE(TAG, "Tried to set level of an input pin P%d.%d", port, bit);
-        return -1;  // Pin is an input
+        return ESP_FAIL;  // Pin is an input
     }
     if (value) {
         device->reg_output[port] |= (1 << bit);
@@ -130,9 +126,7 @@ int pca9555_set_gpio_value(PCA9555* device, int pin, bool value) {
     }
     printf("\n");
     uint8_t   reg = port ? REG_OUTPUT_1 : REG_OUTPUT_0;
-    esp_err_t res = write_reg(device, reg, &device->reg_output[port], 1);
-    if (res != ESP_OK) return -1;
-    return 0;
+    return write_reg(device, reg, &device->reg_output[port], 1);
 }
 
 int pca9555_get_gpio_value(PCA9555* device, int pin) {

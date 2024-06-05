@@ -54,7 +54,7 @@ extern esp_err_t pca9555_init(PCA9555* device);
  * @param direction 1 is input, 0 is output
  * @return 0 on success; -1 on error
  */
-extern int pca9555_set_gpio_direction(PCA9555* device, int pin, bool direction);
+extern esp_err_t pca9555_set_gpio_direction(PCA9555* device, int pin, bool direction);
 
 /**
  * Retrieve the current direction of a pin
@@ -69,7 +69,7 @@ extern int pca9555_get_gpio_direction(PCA9555* device, int pin);
  * @param direction 0 is normal, 1 is inverted
  * @return 0 on success; -1 on error
  */
-extern int pca9555_set_gpio_polarity(PCA9555* device, int pin, bool polarity);
+extern esp_err_t pca9555_set_gpio_polarity(PCA9555* device, int pin, bool polarity);
 
 /**
  * Retrieve the current polarity of a pin
@@ -84,7 +84,7 @@ extern int pca9555_get_gpio_polarity(PCA9555* device, int pin);
  * @param value 0 is low; 1 is high
  * @return 0 on success; -1 on error
  */
-extern int pca9555_set_gpio_value(PCA9555* device, int pin, bool value);
+extern esp_err_t pca9555_set_gpio_value(PCA9555* device, int pin, bool value);
 
 /**
  * Retrieve the current state of a GPIO pin
